@@ -1,0 +1,93 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>
+            RedFly Grid
+        </title>
+        <script src="jquery.min.js" type="text/javascript">
+        </script>
+        <script src="jquery.gesture.js" type="text/javascript">
+        </script>
+        <script src="jquery.gesture.dev.js" type="text/javascript">
+        </script>
+        <script type="text/javascript">
+            $( function () {
+			// @see .dev file for usage example
+			var gesture = $.gesture()               // gesture recognition instance
+				, board = gesture.board( 600, 400 ) // canvas to test gesture recognition
+					.on( 'selectstart.gesture contextmenu.gesture keydown.gesture', false )
+					.on( 'keyup.gesture', function () {
+						if ( event.which == 32 ) // space
+							return board.triggerHandler( 'recognize.gesture' );
+						if ( event.which == 13 ) // enter
+							return board.triggerHandler( 'learn.gesture' );
+						if ( event.which == 27 ) // escape
+							return board.triggerHandler( 'reset.gesture' );
+					} )
+					.on( 'recognize.gesture', function ( event ) {
+						if ( $.isEmptyObject( gesture.gestures ) )
+							return console.log( 'You should save a gesture before trying to recognize anything !' );
+						if ( ! event.result  )
+							return console.log( 'No result' );
+						console.log( event.result.name + ' gesture recognized (' + event.result.strokes + ' strokes), score: ' + Math.ceil( event.result.score ) );
+						showInfo(event.result.name);
+						board.triggerHandler( 'reset.gesture' );
+					} )
+					.on( 'learn.gesture', function ( event ) {
+						if ( ! event.result )
+							return;
+						console.log( 'Learned ' + event.result.name + ' gesture (' + event.result.strokes.length + ' strokes)' );
+						//console.log( 'Export of ' + name + ' gesture: { "' + name + '" :', gesture.export( name ), '}' );
+						board.triggerHandler( 'reset.gesture' );
+					} )
+					.on( 'save.gesture', function () {
+						console.log( 'Stroke #' + event.result.length  );
+					} )
+					.on( 'reset.gesture', function () {
+						console.log( 'Board & gesture recording cleared' );
+					} );
+			$( '.grid' ).prepend( board );
+		} );
+
+            function showInfo(text){
+            	$('p').text(text);
+            }
+        </script>
+        <style type="text/css">
+            html,
+		.grid {
+			margin     : 0;
+			height     : 100%;
+			text-align : center;
+		}
+		canvas {
+			display    : inline-block;
+			margin-top : 30px;
+		}
+        </style>
+    </head>
+    <body>
+        <h1>
+            <span style="color: red;">
+                RedFly
+            </span>
+            Grid
+        </h1>
+        <div class="grid">
+        </div>
+        <p id="info">
+        </p>
+        <p>
+            Draw gestures on the board.
+        </p>
+        <p>
+            Press ESC to clear the board,
+        </p>
+        <p>
+            ENTER to save new gesture & SPACE to recognize drawn gesture.
+        </p>
+        <p>
+            Use TAB to get focus on the board without drawing on it.
+        </p>
+    </body>
+</html>
